@@ -33,14 +33,14 @@ namespace Persistence.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configuración de las relaciones y restricciones de las entidades
+            // 
 
             modelBuilder.Entity<Category>();
 
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.Property(p => p.Price)
-                    .HasColumnType("decimal(18, 2)"); // Definimos el tipo de dato decimal con precisión de 18 y escala de 2
+                    .HasColumnType("decimal(18, 2)"); 
 
                 entity.HasOne(d => d.IdCategoryNavigation).WithMany(p => p.Products)
                     .HasForeignKey(d => d.IdCategory)
@@ -49,7 +49,7 @@ namespace Persistence.DBContext
             });
 
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.UserName) // Creamos un índice único para el nombre de usuario
+                .HasIndex(u => u.UserName) 
                 .IsUnique();
 
 
