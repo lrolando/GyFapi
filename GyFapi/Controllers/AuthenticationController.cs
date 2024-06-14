@@ -35,7 +35,7 @@ namespace GyFapi.Controllers
             if (userResponse.status == 200)
             { response = Ok(userResponse); }
             else
-            { response = BadRequest(userResponse); }
+            { response = Unauthorized(userResponse); }
 
             return response;
         }

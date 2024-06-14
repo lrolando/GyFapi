@@ -67,7 +67,7 @@ namespace Services.AuthService
                 else
                 {
                     response.message = "Usuario invalido";
-                    response.status = 200;
+                    response.status = 401;
                 }
             }
             catch (Exception ex)
