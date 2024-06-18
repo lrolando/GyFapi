@@ -2,15 +2,10 @@
 using Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Persistence.DBContext;
 using Persistence.Repository;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.AuthService
 {
@@ -25,14 +20,14 @@ namespace Services.AuthService
         {
             this.userRepository = userRepository;
 
-            //secretKey = config.GetSection("settings").GetSection("secretKey").ToString();
+            secretKey = config.GetSection("settings").GetSection("secretKey").ToString();
 
         }
 
-        public async Task<Response<User>> Authenticate(AuthRequest userReq)
+        public async Task<Response<AuthResponse>> Authenticate(AuthRequest userReq)
         {
 
-            var response = new Response<User>();
+            var response = new Response<AuthResponse>();
 
             try
             {
@@ -43,6 +38,8 @@ namespace Services.AuthService
 
                 if (userAuth != null)
                 {
+                    var keyBytes = Encoding.ASCII.GetBytes(secretKey);
+
                     var claims = new ClaimsIdentity();
 
                     claims.AddClaim(new Claim(ClaimTypes.Name, userAuth.UserName));
@@ -52,7 +49,7 @@ namespace Services.AuthService
                     {
                         Subject = claims,
                         Expires = DateTime.UtcNow.AddMinutes(120),
-                        //SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
                     };
 
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -60,8 +57,14 @@ namespace Services.AuthService
 
                     string tokencreated = tokenHandler.WriteToken(tokenConfig);
 
-                    response.message = tokencreated;
-                    response.data = userAuth;
+                    var authResponse = new AuthResponse()
+                    {
+                        UserId = userAuth.Id,
+                        UserName = userAuth.UserName,
+                        Token = tokencreated
+                    };
+                    response.message = "Usuario autenticado";
+                    response.data = authResponse;
                     response.status = 200;
                 }
                 else

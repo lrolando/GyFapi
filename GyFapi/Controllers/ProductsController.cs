@@ -1,45 +1,105 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Commons.DTOs;
+using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ProductsCRUD;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GyFapi.Controllers
 {
-    [Route("api/[controller]")]
     [Authorize]
+    [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
+
+        readonly IProductsService productsService;
+
+        public ProductsController(IProductsService productsService)
+        {
+            this.productsService = productsService;
+
+        }
+
         // GET: api/<ProductsController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<Response<IEnumerable<ProductResponse>>>> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            ActionResult response;
+
+            var productResponse = await productsService.GetAll();
+
+            if (productResponse.status == 200)
+            { response = Ok(productResponse); }
+            else
+            { response = BadRequest(productResponse); }
+
+            return response;
         }
 
         // GET api/<ProductsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<Response<ProductResponse>>> GetById(int id)
         {
-            return "value";
+            ActionResult response;
+
+            var productResponse = await productsService.GetById(id);
+
+            if (productResponse.status == 200)
+            { response = Ok(productResponse); }
+            else
+            { response = BadRequest(productResponse); }
+
+            return response;
         }
 
         // POST api/<ProductsController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<Response<ProductResponse>>> Add(ProductRequest product)
         {
+            ActionResult response;
+
+            var productResponse = await productsService.Add(product);
+
+            if (productResponse.status == 200)
+            { response = Ok(productResponse); }
+            else
+            { response = BadRequest(productResponse); }
+
+            return response;
         }
 
         // PUT api/<ProductsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<ActionResult<Response<ProductResponse>>> Update(int id, [FromBody] ProductRequest product)
         {
+            ActionResult response;
+
+            var productResponse = await productsService.Update(id, product);
+
+            if (productResponse.status == 200)
+            { response = Ok(productResponse); }
+            else
+            { response = BadRequest(productResponse); }
+
+            return response;
         }
 
         // DELETE api/<ProductsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<Response<ProductResponse>>> Delete(int id)
         {
+            ActionResult response;
+
+            var productResponse = await productsService.Delete(id);
+
+            if (productResponse.status == 200)
+            { response = Ok(productResponse); }
+            else
+            { response = BadRequest(productResponse); }
+
+            return response;
         }
     }
 }
